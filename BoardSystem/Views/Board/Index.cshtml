@@ -1,0 +1,70 @@
+﻿
+
+    <a class="btn btn-warning " asp-controller="Board" asp-action="Add">投稿</a>
+    <table class="table table-bordered" id="table">
+
+        <tr>
+            <th>番号</th>
+            <th>題目</th>
+            <th>ユーザー</th>
+            <th>日付</th>
+            <th>アクセス数</th>
+        </tr>
+
+        @{
+            var a = Model.Count;
+            ViewBag.b = 10;
+            foreach (var board in Model)
+            {
+            <tr>
+                <td>@board.BoardNum</td>
+                <td><a asp-controller="Board" asp-action="Detail" asp-route-boardNum="@board.BoardNum">@board.BoardTitle</a></td>
+                <td>@board.UserId</td>
+                <td>@board.BoardDate</td>
+                <td>@board.BoardViews</td>
+            </tr>
+            }
+        }
+
+    </table>
+
+    <script>
+        var page = 0;
+        var work = true;
+        $(window).scroll(function () {
+            if (work && $(window).scrollTop() == $(document).height() - $(window).height()) {
+                console.log(++page);
+                getScrolled(page);
+            }
+        });
+
+        function getScrolled(startNo) {
+            $.ajax({
+            url:"Board/Paging?page=" + startNo ,
+            type: "GET",
+            dataType: "json",
+                success: function (result) {
+                    console.log(result);
+
+                let length = result.length;
+                if( length <= 0 ){
+                    work = false;
+                }
+                    if (work || length > 0) {
+                        console.log("loop");
+                    $.each(result, function (index, item) {
+                        console.log(item);
+                        $("#table").append('<tr>' +
+                            '<td>' + item.No + '</td>' +
+                            '<td><a asp-controller="Board" asp-action="Detail" asp-route-boardNum="' + item.No +'">' + item.Title + '</a></td>' +
+                            '<td>' + item.User + '</td>' +
+                            '<td>' + item.Date + '</td>' +
+                            '<td>' + item.Views + '</td>' +
+                            '</tr>');
+                    });
+                }
+            }
+        });
+        }
+    </script>
+ 
